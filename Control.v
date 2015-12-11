@@ -20,7 +20,7 @@ output RegDst, Jal, ExtFormat, MemRead, MemtoReg, ALUSrcA, ALUSrcB, MemWrite, Re
 output [3:0] ALUOp;
 output [1:0] PCSrc;
 
-reg RType, iAdd, iAnd, iBeq, iBne, iJ, iJal, iJr, iLui, iLw, iOr, iSll, iSrl, iSw, iSub, iXor, iSra;
+reg RType, iAdd, iAnd, iBeq, iBne, iJ, iJal, iJr, iLui, iLw, iOr, iSll, iSrl, iSw, iSub, iXor, iSra, iSlt;
 always @(*)
 begin
 	RType = (Opcode == 6'h00)?1:0;
@@ -39,22 +39,22 @@ begin
 	iSw  = (Opcode == 6'h2b)?1:0;
 	iSub = (RType && Funct==6'h22)?1:0;
 	iXor = (RType && Funct==6'h26 || Opcode == 6'h0e)?1:0;
-	iSra = (RType && Funct==6'h02)?1:0;
-	
+	iSra = (RType && Funct==6'h03)?1:0;
+	iSlt = (RType && Funct==6'h2a || Opcode == 6'h0a)?1:0;
 end
 assign RegDst = ~RType;
 assign Jal = iJal;
-assign ExtFormat = iAdd | iLw | iSw;
+assign ExtFormat = iAdd | iLw | iSw | iBne | iBeq;
 assign MemRead = iLw;
 assign MemtoReg = iLw;
-assign ALUSrcA = iSll | iSrl;
-assign ALUSrcB = ~RType;
+assign ALUSrcA = iSll | iSrl | iSra;
+assign ALUSrcB = ~(RType | iBeq | iBne);
 assign MemWrite = iSw;
 assign RegWrite = ~(iBeq | iBne | iJ | iJr | iSw);
 assign ALUOp[3] = iSra | iLui;
-assign ALUOp[2] = iSub | iSll | iSrl | iBne | iBeq;
-assign ALUOp[1] = iAdd | iSub | iXor | iBne | iBeq | iSw | iLw;
-assign ALUOp[0] = iOr  | iXor | iSrl | iSra;
+assign ALUOp[2] = iSub | iSll | iSrl | iBne | iBeq | iSlt;
+assign ALUOp[1] = iAdd | iSub | iXor | iBne | iBeq | iSw | iLw | iSlt;
+assign ALUOp[0] = iOr  | iXor | iSrl | iSra | iSlt;
 assign PCSrc[1] = iJr  | iJ   | iJal;
 assign PCSrc[0] = iBne&~Zero | iBeq&Zero | iJal | iJ;
 endmodule

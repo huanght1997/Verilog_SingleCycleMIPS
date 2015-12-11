@@ -66,7 +66,7 @@ assign ALUSrcA = (CtrlALUSrcA==0)?RFReadData1:IMInstr[10:6];
 assign ALUSrcB = (CtrlALUSrcB==0)?RFReadData2:ExtOut;
 assign Opcode = IMInstr[31:26];
 assign Funct = IMInstr[5:0];
-assign PCWrite = (PCSrc[1]==0)?((PCSrc[0]==0)?NextPC:NextPC+ExtOut<<2)
+assign PCWrite = (PCSrc[1]==0)?((PCSrc[0]==0)?NextPC:NextPC+(ExtOut<<2))
 	:((PCSrc[0]==0)?RFReadData1:{NextPC[31:28],IMInstr[25:0],2'b00});
 
 endmodule

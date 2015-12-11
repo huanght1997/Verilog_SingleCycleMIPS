@@ -9,13 +9,16 @@ output [31:0] ReadData;
 
 reg [31:0] Memory [1023:0];
 reg [31:0] Read;
+always @(*)
+begin
+if (MemRead)
+begin
+	Read <= Memory[Address];
+end
+end
 
 always @(posedge Clock)
 begin
-	if (MemRead)
-	begin
-		Read <= Memory[Address];
-	end
 	if (MemWrite)
 	begin
 		Memory[Address] <= WriteData;
